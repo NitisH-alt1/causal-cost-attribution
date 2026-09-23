@@ -4,6 +4,9 @@ import os
 import httpx
 import uuid
 
+from prometheus_fastapi_instrumentator import Instrumentator
+
+
 app = FastAPI(
     title="Inventory Service",
     version="1.0.0"
@@ -41,7 +44,6 @@ def health():
 
 @app.post("/reserve", response_model=ReserveResponse)
 async def reserve_inventory(request: ReserveRequest):
-
     if request.quantity <= 0:
         raise HTTPException(
             status_code=400,
@@ -84,3 +86,6 @@ async def reserve_inventory(request: ReserveRequest):
         payment_status=payment_data["status"],
         status="reserved"
     )
+
+
+Instrumentator().instrument(app).expose(app)

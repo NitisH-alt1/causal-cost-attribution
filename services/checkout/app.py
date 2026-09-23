@@ -4,6 +4,9 @@ import os
 import httpx
 import uuid
 
+from prometheus_fastapi_instrumentator import Instrumentator
+
+
 app = FastAPI(
     title="Checkout Service",
     version="1.0.0"
@@ -38,7 +41,6 @@ def health():
 
 @app.post("/checkout", response_model=CheckoutResponse)
 async def checkout(request: CheckoutRequest):
-
     if request.quantity <= 0:
         raise HTTPException(
             status_code=400,
@@ -81,3 +83,6 @@ async def checkout(request: CheckoutRequest):
         payment_status=inventory_data["payment_status"],
         status="completed"
     )
+
+
+Instrumentator().instrument(app).expose(app)

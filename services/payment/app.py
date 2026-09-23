@@ -1,7 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from uuid import uuid4
 import time
+import os
+
+from prometheus_fastapi_instrumentator import Instrumentator
+
 
 app = FastAPI(
     title="Payment Service",
@@ -21,6 +25,9 @@ class PaymentResponse(BaseModel):
     amount: float
 
 
+failure_mode = "normal"
+
+
 @app.get("/health")
 def health():
     return {
@@ -29,12 +36,48 @@ def health():
     }
 
 
+@app.get("/control/status")
+def control_status():
+    return {
+        "service": "payment",
+        "failure_mode": failure_mode
+    }
+
+
+@app.post("/control/failure")
+def control_failure(payload: dict):
+    global failure_mode
+
+    mode = payload.get("mode", "normal")
+
+    if mode not in {"normal", "payment_error", "payment_slow"}:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid failure mode"
+        )
+
+    failure_mode = mode
+
+    return {
+        "service": "payment",
+        "failure_mode": failure_mode
+    }
+
+
 @app.post("/authorize", response_model=PaymentResponse)
 def authorize_payment(request: PaymentRequest):
-    payment_id = f"pay-{uuid4().hex[:12]}"
+    if failure_mode == "payment_error":
+        raise HTTPException(
+            status_code=500,
+            detail="Simulated payment failure"
+        )
 
-    # Simulated payment processing time.
-    time.sleep(0.05)
+    if failure_mode == "payment_slow":
+        time.sleep(2.0)
+    else:
+        time.sleep(0.05)
+
+    payment_id = f"pay-{uuid4().hex[:12]}"
 
     return PaymentResponse(
         payment_id=payment_id,
@@ -42,3 +85,6 @@ def authorize_payment(request: PaymentRequest):
         status="authorized",
         amount=request.amount
     )
+
+
+Instrumentator().instrument(app).expose(app)
