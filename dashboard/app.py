@@ -1,10 +1,10 @@
-﻿from fastapi import FastAPI
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pathlib import Path
 import json
 
 app = FastAPI(
-    title="Causal Cost Attribution Engine",
+    title="Cloud Economics Intelligence Platform",
     version="1.0.0"
 )
 
@@ -57,7 +57,7 @@ def dashboard():
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Causal Cost Attribution Engine</title>
+    <title>Cloud Economics Intelligence Platform</title>
 
     <style>
         * {
@@ -224,8 +224,8 @@ def dashboard():
 <body>
 
 <header>
-    <h1>Causal Cost Attribution Engine</h1>
-    <p>Temporal causal candidate analysis for cloud-cost anomalies</p>
+    <h1>Cloud Economics Intelligence Platform</h1>
+    <p>Intelligent cloud cost analysis, causal attribution, and anomaly intelligence</p>
 </header>
 
 <div class="container">
@@ -334,7 +334,7 @@ function renderCausalChain(data) {
             const arrow = document.createElement("div");
 
             arrow.className = "arrow";
-            arrow.textContent = "→";
+            arrow.textContent = "?";
 
             container.appendChild(arrow);
         }
@@ -464,3 +464,4 @@ if __name__ == "__main__":
         host="127.0.0.1",
         port=8080
     )
+
