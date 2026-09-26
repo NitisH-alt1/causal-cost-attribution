@@ -1,0 +1,28 @@
+{
+  "currency": "USD",
+  "model": "resource-based estimated attribution",
+  "total_cost_increase": 1.33,
+  "services": {
+    "checkout": {
+      "baseline_cost": 1.5,
+      "current_cost": 1.5,
+      "cost_increase": 0.0,
+      "cost_anomaly_score": 0.0,
+      "attribution_share": 0.0
+    },
+    "inventory": {
+      "baseline_cost": 2.89,
+      "current_cost": 3.52,
+      "cost_increase": 0.63,
+      "cost_anomaly_score": 0.218,
+      "attribution_share": 0.4737
+    },
+    "payment": {
+      "baseline_cost": 1.47,
+      "current_cost": 2.17,
+      "cost_increase": 0.7,
+      "cost_anomaly_score": 0.476,
+      "attribution_share": 0.5263
+    }
+  }
+}

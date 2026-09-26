@@ -15,5 +15,5 @@ env/
 
 *.log
 
-data/*
+# data/*
 !data/.gitkeep

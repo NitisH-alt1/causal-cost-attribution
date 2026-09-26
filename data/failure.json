@@ -1,0 +1,15 @@
+{
+  "payment": {
+    "error_rate": 0.85,
+    "request_latency_ms": 2500
+  },
+  "inventory": {
+    "error_rate": 0.18,
+    "cpu_usage": 92,
+    "request_count": 850
+  },
+  "checkout": {
+    "error_rate": 0.12,
+    "request_count": 120
+  }
+}

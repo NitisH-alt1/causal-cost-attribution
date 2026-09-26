@@ -1,0 +1,11 @@
+{
+  "anomalous_service": "payment",
+  "event_time": null,
+  "causal_chain": [
+    "payment",
+    "inventory",
+    "checkout"
+  ],
+  "candidate_root_cause": "payment",
+  "dependency_depth": 2
+}

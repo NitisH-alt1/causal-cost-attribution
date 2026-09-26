@@ -1,0 +1,18 @@
+[
+  {
+    "cause_service": "payment",
+    "affected_service": "inventory",
+    "dependency": "inventory -> payment",
+    "anomaly_strength": 0.9859,
+    "propagation_strength": 0.9667,
+    "causal_candidate_score": 0.9782
+  },
+  {
+    "cause_service": "inventory",
+    "affected_service": "checkout",
+    "dependency": "checkout -> inventory",
+    "anomaly_strength": 0.9667,
+    "propagation_strength": 0.9583,
+    "causal_candidate_score": 0.9633
+  }
+]
