@@ -284,6 +284,32 @@ def dashboard():
             </tbody>
         </table>
     </div>
+    <div class="section">
+        <h2>Cost Attribution</h2>
+
+        <div class="card" style="margin-bottom:18px;">
+            <div class="card-title">Total Cost Increase</div>
+            <div class="card-value" id="total-cost-increase">Loading...</div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Baseline Cost</th>
+                    <th>Current Cost</th>
+                    <th>Cost Increase</th>
+                    <th>Attribution Share</th>
+                </tr>
+            </thead>
+            <tbody id="cost-table">
+                <tr>
+                    <td colspan="5">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 
     <div class="section">
         <h2>Anomaly Data</h2>
@@ -334,7 +360,7 @@ function renderCausalChain(data) {
             const arrow = document.createElement("div");
 
             arrow.className = "arrow";
-            arrow.textContent = "?";
+            arrow.textContent = "→";
 
             container.appendChild(arrow);
         }
@@ -382,6 +408,36 @@ function renderCandidates(candidates) {
 }
 
 
+function renderCostAttribution(data) {
+const total = Number(data.total_cost_increase ?? 0);
+
+document.getElementById("total-cost-increase").textContent =
+    `${data.currency ?? "USD"} ${total.toFixed(2)}`;
+
+const table = document.getElementById("cost-table");
+table.innerHTML = "";
+
+const services = data.services || {};
+
+Object.entries(services).forEach(([service, values]) => {
+    const row = document.createElement("tr");
+
+    const baseline = Number(values.baseline_cost ?? 0);
+    const current = Number(values.current_cost ?? 0);
+    const increase = Number(values.cost_increase ?? 0);
+    const share = Number(values.attribution_share ?? 0);
+
+    row.innerHTML = `
+        <td>${service}</td>
+        <td>${baseline.toFixed(2)}</td>
+        <td>${current.toFixed(2)}</td>
+        <td class="score">${increase.toFixed(2)}</td>
+        <td>${(share * 100).toFixed(1)}%</td>
+    `;
+
+    table.appendChild(row);
+});
+}
 async function loadDashboard() {
     try {
         const chain = await fetchJSON("/api/causal-chain");
@@ -402,7 +458,12 @@ async function loadDashboard() {
 
         renderCandidates(candidates);
 
-        const anomalies =
+        
+
+        const cost =
+            await fetchJSON("/api/cost");
+
+        renderCostAttribution(cost);const anomalies =
             await fetchJSON("/api/anomalies");
 
         document.getElementById("anomalies").textContent =
