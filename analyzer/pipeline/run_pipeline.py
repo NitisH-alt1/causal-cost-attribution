@@ -2,6 +2,7 @@
 from pathlib import Path
 
 import requests
+import time
 
 from analyzer.causal.causal_engine import analyze_causal_chain
 from analyzer.cost.cost_model import (
@@ -17,22 +18,46 @@ JAEGER_URL = "http://localhost:16686/api/traces"
 
 
 def capture_trace():
-    response = requests.get(
-        JAEGER_URL,
-        params={"service": "checkout", "limit": 1},
-        timeout=10,
+    for attempt in range(10):
+        response = requests.get(
+            JAEGER_URL,
+            params={
+                "service": "checkout",
+                "operation": "POST /checkout",
+                "limit": 20,
+            },
+            timeout=10,
+        )
+        response.raise_for_status()
+        trace_data = response.json()
+
+        for trace in trace_data.get("data", []):
+            services = {
+                process.get("serviceName")
+                for process in trace.get("processes", {}).values()
+                if process.get("serviceName")
+            }
+
+            if {"checkout", "inventory", "payment"}.issubset(services):
+                (DATA_DIR / "sample-trace.json").write_text(
+                    json.dumps({"data": [trace]}, indent=2),
+                    encoding="utf-8",
+                )
+                print(
+                    "Captured distributed checkout trace:",
+                    trace.get("traceID"),
+                    "services=",
+                    sorted(services),
+                )
+                return {"data": [trace]}
+
+        if attempt < 9:
+            time.sleep(2)
+
+    raise RuntimeError(
+        "No distributed POST /checkout trace containing "
+        "checkout, inventory, and payment was found."
     )
-    response.raise_for_status()
-
-    trace_data = response.json()
-
-    (DATA_DIR / "sample-trace.json").write_text(
-        json.dumps(trace_data, indent=2),
-        encoding="utf-8",
-    )
-
-    return trace_data
-
 
 def build_causal_chain():
     result = analyze_causal_chain("payment")
@@ -134,3 +159,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
